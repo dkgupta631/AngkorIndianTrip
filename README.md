@@ -1,106 +1,86 @@
-# AngkorIndianTrip — website
+# Angkor Indian Trip
 
-A fast, static website (HTML + CSS + JavaScript) for the Angkor Wat, Cambodia tour.
-No WordPress, no database — it runs free on **GitHub Pages**.
+A lightweight travel website for showcasing Angkor Wat and nearby experiences in Cambodia. The project is built as a static website using HTML, CSS, and JavaScript, with a simple structure that is easy to maintain and deploy.
 
-## Pages
+## Project overview
 
-| File | Page |
-|---|---|
-| `index.html` | Home |
-| `about-us.html` | About Us |
-| `tour.html` | Tour (itinerary, inclusions, policy, terms) |
-| `attractions.html` | Attractions + transport |
-| `traveller-zone.html` | Traveller Zone (visa, currency, emergency numbers) |
-| `contact-us.html` | Contact us (enquiry form, map, FAQ) |
+This site is designed to help visitors:
 
-## What to edit, and where
+- explore the destination and key attractions
+- understand the tour itinerary and travel details
+- find useful traveller information
+- contact the tour operator through the website
 
-| I want to change… | Edit this file | Language |
-|---|---|---|
-| **Menu items** (Home, About Us, …) — rename, add, remove | `js/menu.js` → the `MENU` list at the top | JavaScript |
-| Footer "Temples Covered" list | `js/menu.js` → `TEMPLES_COVERED` | JavaScript |
-| Phone, WhatsApp, email, address, social links | `js/config.js` | JavaScript |
-| Where the enquiry forms send data | `js/config.js` → `formEndpoint` | JavaScript |
-| Colours, fonts, spacing | `css/style.css` → `:root` at the top | CSS |
-| Page text and photos | the page's `.html` file | HTML |
-| Logo | `assets/img/logo.webp` (light backgrounds) and `assets/img/logo-light.webp` (dark backgrounds) | — |
+The project keeps content simple and fast-loading, with no database or server-side application required for the public website.
 
-Example — rename "Tour" to "Packages" in the menu on every page:
+## Main pages
 
-```js
-// js/menu.js
-{ label: "Packages", href: "tour.html", page: "tour" },
+- `index.html` — Home page
+- `about-us.html` — About the company and destination story
+- `tour.html` — Tour details, itinerary, inclusions, and policies
+- `attractions.html` — Attractions and transport information
+- `traveller-zone.html` — Visitor guidance and planning information
+- `contact-us.html` — Contact details, enquiry form, and FAQ
+
+## Project structure
+
+- `css/style.css` — main styling, layout, colors, and responsive design
+- `js/config.js` — contact details, social links, and site-wide configuration
+- `js/menu.js` — navigation items and reusable menu content
+- `js/i18n.js` — language switching logic
+- `js/lang-hi.js` — Hindi translations
+- `assets/img/` — images and brand assets
+- `assets/video/` — video assets if used on the site
+
+## How to edit content
+
+### Navigation and menu items
+
+Update the menu labels and links in `js/menu.js`.
+
+### Contact and business details
+
+Edit the public contact information in `js/config.js`.
+
+### Styling and branding
+
+Adjust colors, spacing, fonts, and layout in `css/style.css`.
+
+### Page text
+
+Update each page directly in its matching HTML file.
+
+### Images
+
+Add new images to `assets/img/photos/` and reference them from the relevant page.
+
+## Local preview
+
+You can preview the site locally by either:
+
+1. opening `index.html` directly in a browser, or
+2. running this in the project folder:
+
+```bash
+python -m http.server
 ```
 
-### Brand colours (from the logo)
+Then visit:
 
-| Name | Hex | Used for |
-|---|---|---|
-| Orange | `#E8461F` | Buttons, highlights, day numbers |
-| Navy | `#2B2A7C` | Header text, dark sections, footer |
-| Gold | `#E8B02D` | Accents on dark backgrounds |
-| Grey | `#5F6368` | Secondary text |
+```text
+http://localhost:8000
+```
 
-## Where do form enquiries go?
+## Deployment
 
-GitHub Pages only serves files — it **cannot store form data**. The forms send data to a
-free **Google Sheet** instead. Every enquiry becomes a new row, and you also get an email.
+This project is set up for static hosting and can be deployed to any static site host, including GitHub Pages.
 
-**Until this is set up**, the forms open WhatsApp with the customer's details filled in,
-so no enquiry is lost.
+## Languages
 
-### Set up the Google Sheet (about 5 minutes)
+The site supports bilingual content with English and Hindi. Translation text is managed in `js/lang-hi.js`, while the main page content remains in English.
 
-1. Go to [sheets.new](https://sheets.new) (signed in as **angkorindiantrip@gmail.com**). Name it *Website Enquiries*.
-2. **Extensions → Apps Script**. Delete the sample code, paste everything from
-   `google-apps-script/Code.gs`, and click **Save**.
-3. **Deploy → New deployment** → gear icon → **Web app**.
-   - Execute as: **Me**
-   - Who has access: **Anyone**
-4. Click **Deploy**, allow the permissions, and **copy the Web app URL**
-   (it looks like `https://script.google.com/macros/s/…/exec`).
-5. Paste it into `js/config.js`:
-   ```js
-   formEndpoint: "https://script.google.com/macros/s/XXXX/exec"
-   ```
-6. Commit and push. Test the form — a row appears in the **Enquiries** tab (newsletter sign-ups go to the **Newsletter** tab).
+## Notes
 
-> If you later change `Code.gs`, use **Deploy → Manage deployments → Edit → New version**
-> so the URL stays the same.
-
-## Deploy on GitHub Pages
-
-1. Push this folder to a GitHub repository.
-2. Repo → **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main`, folder `/ (root)` → **Save**.
-3. After about a minute the site is live at `https://<username>.github.io/<repo>/`.
-
-### Custom domain (optional)
-
-1. Settings → Pages → **Custom domain** → enter e.g. `www.angkorindiantrip.com` → Save. Tick **Enforce HTTPS** once it's available.
-2. At your domain registrar, add DNS records:
-   - `CNAME` `www` → `<username>.github.io`
-   - For the root domain, `A` records → `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-
-## Photos
-
-All photos are stored in the site itself — nothing loads from the old site (`vishnuinternationaltours.com`) any more.
-
-- Page photos: `assets/img/photos/`
-- Home hero slider photos: `assets/img/hero/`
-- Gallery video: `assets/video/`
-
-To add a photo, put the file in `assets/img/photos/` and reference it as `assets/img/photos/your-file.jpg`.
-
-## Preview locally
-
-Open `index.html` in a browser, or run `python -m http.server` in this folder and visit
-http://localhost:8000.
-
-## Languages (English / Hindi)
-
-The pages are written in English. The flag buttons in the header switch to Hindi; the choice is remembered on the visitor's device.
-
-- Hindi text lives in `js/lang-hi.js` as `"English text": "हिन्दी पाठ"` pairs.
-- When you change or add English text on a page, add or update the matching line there. The English side must match the page text exactly — anything without a match simply stays in English.
-- Phone, email, the office address and image descriptions are not translated.
+- This is a static front-end project.
+- It is designed to be easy to maintain without a CMS or backend.
+- The content and branding can be updated directly in the existing HTML, CSS, and JavaScript files.
