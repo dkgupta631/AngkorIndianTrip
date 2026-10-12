@@ -192,6 +192,20 @@
   /* Enquiry & newsletter forms */
   var LABELS = { name: "Name", phone: "Phone", email: "Email", month: "Travel month", travellers: "Travellers", message: "Message" };
 
+  function showToast(message, type) {
+    var toast = document.getElementById("site-toast");
+    if (!toast) {
+      toast = document.createElement("div");
+      toast.id = "site-toast";
+      document.body.appendChild(toast);
+    }
+    toast.className = "toast toast-" + (type || "success");
+    toast.textContent = message;
+    toast.classList.add("show");
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(function () { toast.classList.remove("show"); }, 3200);
+  }
+
   /* Keep form values in English whichever language is shown */
   document.querySelectorAll("option:not([value])").forEach(function (o) { o.value = o.textContent; });
 
@@ -213,32 +227,51 @@
       data.append("form", form.getAttribute("data-form"));
       data.append("page", document.title);
 
-      if (S.formEndpoint) {
-        btn.disabled = true;
-        btn.textContent = I18N.t("Sending…");
-        fetch(S.formEndpoint, { method: "POST", mode: "no-cors", body: new URLSearchParams(data) })
-          .then(function () {
-            form.reset();
-            msg.className = "form-msg ok";
-            msg.textContent = form.getAttribute("data-form") === "Newsletter"
-              ? "Thank you — you're subscribed."
-              : "Thank you! We'll call you back with dates and pricing.";
-            I18N.apply(msg);
-          })
-          .catch(function () {
-            msg.className = "form-msg err";
-            msg.textContent = I18N.t("Couldn't send right now. Please WhatsApp us on {phone}.").replace("{phone}", S.phoneDisplay);
-          })
-          .then(function () { btn.disabled = false; btn.textContent = label; I18N.apply(btn); });
-      } else {
-        // No backend configured yet: hand the enquiry to WhatsApp
-        var lines = ["Hello " + S.brand + ", " + (form.getAttribute("data-form") === "Newsletter" ? "please add me to your mailing list." : "I'd like to plan an Angkor Wat trip.")];
-        data.forEach(function (v, k) { if (LABELS[k] && v) lines.push(LABELS[k] + ": " + v); });
-        window.open("https://wa.me/" + S.whatsapp + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
-        msg.className = "form-msg ok";
-        msg.textContent = "Opening WhatsApp with your details — just press send.";
-        I18N.apply(msg);
+      var locationPromise = Promise.resolve("");
+      if (navigator.geolocation) {
+        locationPromise = new Promise(function (resolve) {
+          navigator.geolocation.getCurrentPosition(function (position) {
+            resolve("Lat " + position.coords.latitude + ", Lng " + position.coords.longitude);
+          }, function () { resolve(""); }, { enableHighAccuracy: true, timeout: 10000, maximumAge: 600000 });
+        });
       }
+
+      locationPromise.then(function (customerLocation) {
+        if (customerLocation) {
+          data.append("address", customerLocation);
+          data.append("location", customerLocation);
+        }
+
+        if (S.formEndpoint) {
+          btn.disabled = true;
+          btn.textContent = I18N.t("Sending…");
+          fetch(S.formEndpoint, { method: "POST", mode: "no-cors", body: new URLSearchParams(data) })
+            .then(function () {
+              form.reset();
+              msg.className = "form-msg ok";
+              msg.textContent = form.getAttribute("data-form") === "Newsletter"
+                ? "Thank you — you're subscribed."
+                : "Thank you! We'll call you back with dates and pricing.";
+              showToast(msg.textContent, "success");
+              I18N.apply(msg);
+            })
+            .catch(function () {
+              msg.className = "form-msg err";
+              msg.textContent = I18N.t("Couldn't send right now. Please WhatsApp us on {phone}.").replace("{phone}", S.phoneDisplay);
+              showToast(msg.textContent, "error");
+            })
+            .then(function () { btn.disabled = false; btn.textContent = label; I18N.apply(btn); });
+        } else {
+          // No backend configured yet: hand the enquiry to WhatsApp
+          var lines = ["Hello " + S.brand + ", " + (form.getAttribute("data-form") === "Newsletter" ? "please add me to your mailing list." : "I'd like to plan an Angkor Wat trip.")];
+          data.forEach(function (v, k) { if (LABELS[k] && v) lines.push(LABELS[k] + ": " + v); });
+          window.open("https://wa.me/" + S.whatsapp + "?text=" + encodeURIComponent(lines.join("\n")), "_blank");
+          msg.className = "form-msg ok";
+          msg.textContent = "Opening WhatsApp with your details — just press send.";
+          showToast(msg.textContent, "success");
+          I18N.apply(msg);
+        }
+      });
     });
   });
 
