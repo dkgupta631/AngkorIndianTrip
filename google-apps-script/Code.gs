@@ -22,8 +22,6 @@ var COLUMNS = [
   "Travel month",
   "Travellers",
   "Message",
-  "Page",
-  "Address",
   "Location",
   "IP address"
 ];
@@ -36,7 +34,6 @@ function doPost(e) {
 
   var isNewsletter = p.form === "Newsletter";
   var sheet = getSheet(isNewsletter ? "Newsletter" : "contacts");
-  var customerAddress = clean(p.address || p.location || "");
   var customerLocation = clean(p.location || p.address || "");
   var ipAddress = clean((e && e.headers && e.headers['X-Forwarded-For']) || "");
 
@@ -49,8 +46,6 @@ function doPost(e) {
     clean(p.month),
     clean(p.travellers),
     clean(p.message),
-    clean(p.page),
-    customerAddress,
     customerLocation,
     ipAddress
   ];
@@ -83,7 +78,29 @@ function getSheet(name) {
     sheet.getRange(1, 1, 1, COLUMNS.length).setFontWeight("bold").setBackground("#2B2A7C").setFontColor("#FFFFFF");
     sheet.setFrozenRows(1);
   }
+
+  normalizeSheetColumns(sheet);
   return sheet;
+}
+
+function normalizeSheetColumns(sheet) {
+  var headers = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), COLUMNS.length)).getValues()[0];
+  var staleIndexes = [];
+
+  headers.forEach(function (header, index) {
+    var h = String(header || "").trim();
+    if (h === "Page" || h === "Address") {
+      staleIndexes.push(index + 1);
+    }
+  });
+
+  if (staleIndexes.length === 0) {
+    return;
+  }
+
+  for (var i = staleIndexes.length - 1; i >= 0; i--) {
+    sheet.deleteColumn(staleIndexes[i]);
+  }
 }
 
 function clean(v) {
