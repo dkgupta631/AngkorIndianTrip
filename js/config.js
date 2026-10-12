@@ -24,8 +24,8 @@ window.SITE = {
   },
 
   /* Enquiry forms.
-     Paste your Google Apps Script Web App URL here (see README.md).
-     While it is empty, the forms open WhatsApp with the customer's
-     details filled in, so no enquiry is lost. */
-  formEndpoint: ""
+     Live Apps Script Web App URL connected to the Google Sheet.
+     While it is empty, the forms open WhatsApp with the customer's details filled in,
+     so no enquiry is lost. */
+  formEndpoint: "https://script.google.com/macros/s/AKfycbzx1vbQ1zS-e6V2Xq3tmqvJBH8GplcTswgbLfPK1F3qtu59FbJfzrfgD000sdFjd4fpCQ/exec"
 };

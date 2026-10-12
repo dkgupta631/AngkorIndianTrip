@@ -13,7 +13,20 @@
 
 var NOTIFY_EMAIL = "angkorindiantrip@gmail.com";
 
-var COLUMNS = ["Date & time", "Form", "Name", "Phone", "Email", "Travel month", "Travellers", "Message", "Page"];
+var COLUMNS = [
+  "Date & time",
+  "Form",
+  "Name",
+  "Phone",
+  "Email",
+  "Travel month",
+  "Travellers",
+  "Message",
+  "Page",
+  "Address",
+  "Location",
+  "IP address"
+];
 
 function doPost(e) {
   var p = (e && e.parameter) || {};
@@ -22,7 +35,10 @@ function doPost(e) {
   if (p.website) return json({ ok: true });
 
   var isNewsletter = p.form === "Newsletter";
-  var sheet = getSheet(isNewsletter ? "Newsletter" : "Enquiries");
+  var sheet = getSheet(isNewsletter ? "Newsletter" : "contacts");
+  var customerAddress = clean(p.address || p.location || "");
+  var customerLocation = clean(p.location || p.address || "");
+  var ipAddress = clean((e && e.headers && e.headers['X-Forwarded-For']) || "");
 
   var row = [
     new Date(),
@@ -33,7 +49,10 @@ function doPost(e) {
     clean(p.month),
     clean(p.travellers),
     clean(p.message),
-    clean(p.page)
+    clean(p.page),
+    customerAddress,
+    customerLocation,
+    ipAddress
   ];
   sheet.appendRow(row);
 
