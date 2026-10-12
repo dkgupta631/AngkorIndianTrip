@@ -271,7 +271,6 @@
       var data = new FormData(form);
       data.delete("website");
       data.append("form", form.getAttribute("data-form"));
-      data.append("page", document.title);
 
       var locationPromise = Promise.resolve("");
       if (navigator.geolocation) {
@@ -284,7 +283,6 @@
 
       locationPromise.then(function (customerLocation) {
         if (customerLocation) {
-          data.append("address", customerLocation);
           data.append("location", customerLocation);
         }
 
