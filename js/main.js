@@ -206,6 +206,52 @@
     toast._hideTimer = setTimeout(function () { toast.classList.remove("show"); }, 3200);
   }
 
+  function showSuccessModal(form, message) {
+    var modal = document.getElementById("success-modal");
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "success-modal";
+      modal.className = "success-modal";
+      modal.innerHTML = [
+        '<div class="success-modal-card">',
+        '  <div class="success-modal-icon" aria-hidden="true">',
+        '    <div class="success-gif-wrap">',
+        '      <svg class="success-badge-svg" viewBox="0 0 180 180" xmlns="http://www.w3.org/2000/svg">',
+        '        <circle cx="90" cy="90" r="70" fill="#3CCF74" />',
+        '        <circle cx="90" cy="90" r="82" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="6" />',
+        '        <path d="M58 92 L83 118 L127 69" fill="none" stroke="#ffffff" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />',
+        '      </svg>',
+        '      <div class="success-ring"></div>',
+        '      <div class="success-spark success-spark-1"></div>',
+        '      <div class="success-spark success-spark-2"></div>',
+        '      <div class="success-spark success-spark-3"></div>',
+        '      <div class="success-spark success-spark-4"></div>',
+        '      <div class="success-spark success-spark-5"></div>',
+        '      <div class="success-spark success-spark-6"></div>',
+        '    </div>',
+        '  </div>',
+        '  <h2>Success!</h2>',
+        '  <p class="success-modal-message">Your operation has been completed successfully.</p>',
+        '  <button type="button" class="success-modal-btn">Okay</button>',
+        '</div>'
+      ].join("");
+
+      modal.querySelector(".success-modal-btn").addEventListener("click", function () {
+        modal.classList.remove("show");
+        if (modal._formRef) modal._formRef.reset();
+      });
+
+      document.body.appendChild(modal);
+    }
+
+    modal._formRef = form || modal._formRef;
+    var messageNode = modal.querySelector(".success-modal-message");
+    if (messageNode) {
+      messageNode.textContent = message || messageNode.textContent;
+    }
+    modal.classList.add("show");
+  }
+
   /* Keep form values in English whichever language is shown */
   document.querySelectorAll("option:not([value])").forEach(function (o) { o.value = o.textContent; });
 
@@ -247,13 +293,12 @@
           btn.textContent = I18N.t("Sending…");
           fetch(S.formEndpoint, { method: "POST", mode: "no-cors", body: new URLSearchParams(data) })
             .then(function () {
-              form.reset();
               msg.className = "form-msg ok";
               msg.textContent = form.getAttribute("data-form") === "Newsletter"
                 ? "Thank you — you're subscribed."
                 : "Thank you! We'll call you back with dates and pricing.";
-              showToast(msg.textContent, "success");
               I18N.apply(msg);
+              showSuccessModal(form, msg.textContent);
             })
             .catch(function () {
               msg.className = "form-msg err";
